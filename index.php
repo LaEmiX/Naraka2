@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 session_start();
 
+require __DIR__ . '/config/auth.php';
+
 $pdo = require __DIR__ . '/config/database.php';
 $currentLand = require __DIR__ . '/config/land.php';
 
-$landSlug = htmlspecialchars($currentLand['slug'], ENT_QUOTES, 'UTF-8');
+$landSlug = $currentLand['slug'];
 $landName = htmlspecialchars($currentLand['name'], ENT_QUOTES, 'UTF-8');
+
+$user = $_SESSION['user'];
 
 ?>
 <!DOCTYPE html>
@@ -23,6 +27,11 @@ $landName = htmlspecialchars($currentLand['name'], ENT_QUOTES, 'UTF-8');
 <h1>Naraka</h1>
 
 <p>Land attiva: <?php echo $landName; ?></p>
+
+<p>Benvenuto, <?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></p>
+<a href="/logout.php">Logout</a>
+
+<br><br>
 
 <?php if ($landSlug === 'city') { ?>
 

@@ -29,9 +29,16 @@ $user = $_SESSION['user'];
 <p>Land attiva: <?php echo $landName; ?></p>
 
 <p>Benvenuto, <?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></p>
-<a href="/logout.php">Logout</a>
 
-<br><br>
+<p>
+    <a href="/characters.php">Entra nel gioco</a>
+</p>
+
+<p>
+    <a href="/logout.php">Logout</a>
+</p>
+
+<br>
 
 <?php if ($landSlug === 'city') { ?>
 

@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=VT323&display=swap');
+
+:root {
+    --bg-dark: #070816;
+    --bg-mid: #111437;
+    --panel: rgba(9, 12, 32, 0.88);
+    --panel-border: rgba(0, 255, 255, 0.35);
+    --text: #f2f4ff;
+    --muted: #a8b0d8;
+    --cyan: #00f5ff;
+    --pink: #ff3df2;
+    --purple: #7b2cff;
+    --danger: #ff5f7e;
+    --black: #02030a;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 20% 15%, rgba(255, 61, 242, 0.22), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(0, 245, 255, 0.18), transparent 30%),
+        linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-dark) 55%, #03030b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(0, 245, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 61, 242, 0.12) 1px, transparent 1px);
+    background-size: 48px 48px;
+    transform: perspective(420px) rotateX(62deg) scale(1.7);
+    transform-origin: center bottom;
+    opacity: 0.35;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.035) 0,
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    opacity: 0.32;
+    mix-blend-mode: screen;
+}
+
+a {
+    color: var(--cyan);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--pink);
+}
+
+.auth-panel {
+    position: relative;
+    z-index: 1;
+    width: min(520px, 100%);
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    box-shadow:
+        0 0 24px rgba(0, 245, 255, 0.16),
+        0 0 54px rgba(255, 61, 242, 0.12),
+        inset 0 0 24px rgba(0, 245, 255, 0.06);
+    padding: 28px;
+}
+
+.auth-panel::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border: 1px solid rgba(255, 61, 242, 0.25);
+    pointer-events: none;
+}
+
+.auth-title {
+    margin: 0 0 8px;
+    font-family: 'VT323', monospace;
+    font-size: clamp(44px, 10vw, 72px);
+    line-height: 0.9;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-shadow:
+        2px 0 var(--pink),
+        -2px 0 var(--cyan),
+        0 0 18px rgba(255, 61, 242, 0.45);
+}
+
+.auth-subtitle {
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.auth-errors {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 95, 126, 0.55);
+    background: rgba(255, 95, 126, 0.12);
+    color: #ffd6de;
+}
+
+.auth-errors ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.auth-field {
+    margin-bottom: 16px;
+}
+
+.auth-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--cyan);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.auth-field input {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid rgba(0, 245, 255, 0.35);
+    background: rgba(2, 3, 10, 0.76);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.auth-field input:focus {
+    border-color: var(--pink);
+    box-shadow: 0 0 18px rgba(255, 61, 242, 0.22);
+}
+
+.auth-field-error {
+    margin: 8px 0 0;
+    color: var(--danger);
+    font-size: 13px;
+}
+
+.auth-button {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid var(--cyan);
+    background: linear-gradient(90deg, rgba(0, 245, 255, 0.92), rgba(255, 61, 242, 0.92));
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.auth-button:hover {
+    filter: brightness(1.12);
+}
+
+.auth-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.auth-links {
+    margin-top: 18px;
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.auth-stats-counter {
+    margin: 18px 0;
+    padding: 12px;
+    border: 1px solid rgba(255, 61, 242, 0.4);
+    background: rgba(255, 61, 242, 0.08);
+    color: var(--text);
+}
+
+.auth-stat-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid rgba(0, 245, 255, 0.18);
+    background: rgba(2, 3, 10, 0.52);
+}
+
+.auth-stat-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-stat-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(0, 245, 255, 0.45);
+    background: rgba(0, 245, 255, 0.08);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.auth-stat-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.auth-stat-value {
+    min-width: 24px;
+    text-align: center;
+    color: var(--pink);
+    font-weight: 700;
+}
+
+.auth-summary {
+    display: grid;
+    gap: 14px;
+}
+
+.auth-summary-card {
+    border: 1px solid rgba(0, 245, 255, 0.24);
+    background: rgba(2, 3, 10, 0.52);
+    padding: 14px;
+}
+
+.auth-summary-card h2 {
+    margin: 0 0 10px;
+    font-family: 'VT323', monospace;
+    font-size: 34px;
+    color: var(--cyan);
+}
+
+.auth-summary-card ul {
+    margin: 10px 0 0;
+    padding-left: 18px;
+}
+
+@media (max-width: 560px) {
+    body {
+        padding: 14px;
+        align-items: flex-start;
+    }
+
+    .auth-panel {
+        padding: 20px;
+    }
+
+    .auth-stat-row {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-stat-controls {
+        justify-content: space-between;
+    }
+}

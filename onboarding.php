@@ -601,27 +601,57 @@ $statsEchoesValues = (array) ($_SESSION['onboarding']['stats_echoes'] ?? []);
 
 <?php if ($step === 'city') { ?>
 
-    <div class="auth-panel">
-        <h1 class="auth-title">CITY</h1>
-        <p class="auth-subtitle">Scegli il nome del personaggio che userai nella land City.</p>
+    <div class="auth-page">
 
-        <form method="post" action="/onboarding.php?step=city">
-            <div class="auth-field">
-                <label for="name">Nome personaggio City</label>
-                <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($cityValue, ENT_QUOTES, 'UTF-8'); ?>" required>
-
-                <?php if ($fieldError !== '') { ?>
-                    <p class="auth-field-error"><?php echo htmlspecialchars($fieldError, ENT_QUOTES, 'UTF-8'); ?></p>
-                <?php } ?>
-            </div>
-
-            <button type="submit" class="auth-button">Continua</button>
-        </form>
-
-        <div class="auth-links">
-            <a href="/logout.php">Logout</a>
+        <div class="lene-wrap">
+            <img src="/themes/images/lene1.png" class="lene-image" alt="Lene">
         </div>
+
+        <div class="auth-panel">
+            <p class="lene-text" id="leneText"></p>
+
+            <form method="post" action="/onboarding.php?step=city">
+                <div class="auth-field">
+                    <label for="name">Inserisci il nome del tuo personaggio</label>
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($cityValue, ENT_QUOTES, 'UTF-8'); ?>" required>
+
+                    <?php if ($fieldError !== '') { ?>
+                        <p class="auth-field-error"><?php echo htmlspecialchars($fieldError, ENT_QUOTES, 'UTF-8'); ?></p>
+                    <?php } ?>
+                </div>
+
+                <button type="submit" class="auth-button">Continua</button>
+            </form>
+
+            <div class="auth-links">
+                <a href="/logout.php">Logout</a>
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        const leneText = "Ciao! Benvenuto in Naraka. Io sono Lene, tu come ti chiami?";
+        const leneTarget = document.getElementById("leneText");
+
+        let leneIndex = 0;
+
+        function narakaTypeLeneText() {
+            leneTarget.textContent = leneText.substring(0, leneIndex);
+            leneIndex++;
+
+            if (leneIndex <= leneText.length) {
+                setTimeout(narakaTypeLeneText, 55);
+            } else {
+                setTimeout(() => {
+                    leneIndex = 0;
+                    narakaTypeLeneText();
+                }, 1800);
+            }
+        }
+
+        narakaTypeLeneText();
+    </script>
 
 <?php } elseif ($step === 'echoes') { ?>
 

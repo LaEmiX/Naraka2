@@ -1,283 +1,366 @@
-# NARAKA
-
-GDR testuale multi-land sviluppato in PHP 8 su hosting Aruba Linux.
-
-Il progetto è costruito da zero con struttura modulare, senza codice legacy, con attenzione a solidità backend e scalabilità.
+# NARAKA2 – Documentazione Tecnica (PRO LEVEL)
 
 ---
 
-## ⚙️ Struttura progetto
+## 🧠 VISIONE PROGETTO
 
-```text
-index.php
-login.php
-register.php
-logout.php
-switch_land.php
-onboarding.php
+Naraka è una piattaforma GDR multi-land progettata per offrire:
 
-config/
-├── database.php
-├── land.php
-└── auth.php
+* onboarding narrativo guidato
+* doppia identità personaggio (City / Echoes)
+* esperienza immersiva (UI + audio persistente)
+* architettura scalabile e modulare
 
-themes/
-└── auth.css
+Obiettivo: separare completamente **esperienza utente** e **logica di gioco**, mantenendo un sistema espandibile senza framework.
+
+---
+
+## ⚙️ STACK TECNOLOGICO
+
+* PHP 8 (strict mode)
+* MySQL (InnoDB)
+* CSS custom (no framework)
+* JavaScript vanilla
+* Hosting: Aruba Linux
+
+Vincoli:
+
+* compatibilità browser completa
+* mobile responsive
+* no CSS inline
+* no dipendenze esterne runtime
+
+---
+
+## 📁 ARCHITETTURA FILE
+
+```
+/
+├── app.php               # container principale (audio + iframe)
+├── login.php
+├── register.php
+├── onboarding_*.php
+├── index.php            # entry gameplay
+│
+├── /config/
+│   ├── database.php
+│   ├── auth.php
+│   ├── land.php
+│
+├── /themes/
+│   ├── auth.css
+│   ├── app.css
+│   ├── app.js
+│   ├── /images/
+│   ├── /audio/
 ```
 
-⚠️ Nota:
-Il progetto NON utilizza cartella `htdocs`.
-I file sono già nella root del repository e corrispondono alla root pubblica dell’hosting.
+Pattern:
+
+* ogni pagina = file standalone
+* nessuna dipendenza implicita
+* inclusioni centralizzate
 
 ---
 
-## 🌍 Sistema Multi-Land
+## 🔐 SISTEMA AUTENTICAZIONE
 
-Il gioco è diviso in due land:
+Caratteristiche:
 
-* `city` (default)
+* login via username/email
+* password hashing (`password_hash`)
+* sessioni PHP sicure
+* rigenerazione ID sessione
+
+Flusso:
+
+```
+login → controllo DB → sessione → routing onboarding / game
+```
+
+---
+
+## 🌍 SISTEMA MULTI-LAND
+
+Land attive:
+
+* `city`
 * `echoes`
 
-La land attiva è gestita tramite sessione:
+Gestione:
 
-```php
+```
 $_SESSION['current_land']
 ```
 
-### Comportamento
+Relazioni:
 
-* Il sito si apre sempre su **city**
-* Da city si può accedere a echoes
-* Da echoes si può tornare a city
-* Ogni utente ha **un personaggio per land**
+* 1 utente → 2 personaggi (uno per land)
 
 ---
 
-## 👤 Sistema Utenti
+## 🧬 MODELLO DATI
 
-✔ Registrazione (`register.php`)
-✔ Login (`login.php`)
-✔ Logout (`logout.php`)
-✔ Sessione utente (`$_SESSION['user']`)
-✔ Protezione pagine (`config/auth.php`)
+### users
 
-### Dopo il login:
-
-* Se non hai personaggi → onboarding obbligatorio
-* Se hai entrambi i personaggi → accesso diretto al gioco
-
----
-
-## 🧬 Sistema Personaggi
-
-Ogni utente possiede:
-
-* 1 personaggio in `city`
-* 1 personaggio in `echoes`
-
-### Creazione personaggi (Onboarding)
-
-Flusso completo:
-
-1. Nome personaggio City
-2. Nome personaggio Echoes
-3. Distribuzione statistiche City
-4. Distribuzione statistiche Echoes
-5. Conferma finale
-
----
-
-## 📊 Sistema Statistiche
-
-### City
-
-* Influenza
-* Intelletto
-* Percezione
-* Prontezza
-* Vigore
-* Volontà
-
-### Echoes
-
-* Forza
-* Destrezza
-* Costituzione
-* Intelligenza
-* Saggezza
-* Carisma
-
-### Regole
-
-* Valore minimo: 1
-* Valore massimo: 5
-* Punti totali: 18
-* Solo **una statistica può essere a 5**
-
-✔ Validazione lato server
-✔ Contatore punti lato client
-✔ Blocco automatico distribuzione invalida
-
----
-
-## 🗄️ Database
-
-### Tabelle attuali
-
-```text
-lands
-- id_land
-- name
-- slug
-- theme_folder
-- is_active
-
-users
-- id_user
-- username
-- email
-- password_hash
-- role
-- is_active
-- created_at
-- updated_at
-- last_login_at
-
-characters
-- id_character
-- id_user
-- id_land
-- name
-- slug
-
-stat_groups
-- id_stat_group
-- slug
-- name
-- points_total
-- min_value
-- max_value
-- max_stats_at_cap
-
-stats
-- id_stat
-- id_stat_group
-- slug
-- name
-- sort_order
-- is_active
-
-character_stats
-- id_character_stat
-- id_character
-- id_stat
-- value
+```
+id_user
+username
+email
+password_hash
+role
+is_active
 ```
 
-✔ Relazioni con foreign key
-✔ Cascade delete attivo
-✔ Sistema espandibile (skill/perk futuri)
+### lands
 
----
+```
+id_land
+slug (city / echoes)
+name
+```
 
-## 🎨 UI / Frontend
+### characters
 
-Attualmente implementato:
+```
+id_character
+id_user
+id_land
+name
+slug
+```
 
-* CSS esterno: `themes/auth.css`
-* Nessun CSS inline
-* Stile: **vaporwave informatico anni 80/90**
+### stats
 
-### Linee guida grafiche
+```
+id_stat
+slug
+name
+```
 
-* Font:
+### character_stats
 
-  * Titoli → VT323
-  * Testo → IBM Plex Mono
-* Palette:
-
-  * Blu notte / viola
-  * Neon magenta / cyan
-* Effetti:
-
-  * Griglia prospettica
-  * Glow controllato
-  * Scanline CRT leggere
-
----
-
-## 🔐 Sicurezza
-
-✔ Prepared statements (PDO)
-✔ Password hash (`password_hash`)
-✔ Session regeneration
-✔ Validazione input
-✔ Protezione accesso pagine
-
----
-
-## 📌 Regole progetto
-
-* Nessun codice provvisorio
-* Nessuna duplicazione logica
-* File sempre completi (no patch)
-* Struttura modulare
-* CSS solo esterno (no inline)
-* Compatibilità browser moderni
-* Mobile-first
-* Tutti i file firmati:
-
-```php
-// by LaEmiX
+```
+id_character
+id_stat
+value
 ```
 
 ---
 
-## 🚧 Stato attuale
+## 📊 SISTEMA STATISTICHE
 
-✔ Sistema utenti completo
-✔ Sistema multi-land
-✔ Sistema onboarding completo
-✔ Sistema personaggi per land
-✔ Sistema statistiche completo
-✔ UI base vaporwave implementata
-✔ Routing corretto login → onboarding → gioco
+### CITY
 
----
+* influenza
+* intelletto
+* percezione
+* prontezza
+* vigore
+* volonta
 
-## 🚀 Prossimi step
+### ECHOES
 
-* Sistema location
-* Chat in tempo reale
-* Skill system
-* Perk system
-* Inventario
-* Forum
-* Admin panel
+* forza
+* destrezza
+* costituzione
+* intelligenza
+* saggezza
+* carisma
 
----
+### REGOLAMENTO
 
-## 🧠 Filosofia del progetto
+* min: 1
+* max: 5
+* totale: 18
+* max una stat a 5
 
-Naraka non è un GDR generico.
+### VALIDAZIONE
 
-È progettato come:
-
-* sistema modulare
-* backend solido prima della UI
-* esperienza coerente tra land
-* crescita progressiva senza refactor distruttivi
+* frontend (JS): UX
+* backend (PHP): sicurezza
 
 ---
 
-## 🧪 Ambiente
+## 🧭 ONBOARDING SYSTEM
 
-* PHP 8 (strict types)
-* MySQL (PDO)
-* Hosting Aruba Linux
+### FLOW
+
+```
+login/register
+→ onboarding_city
+→ onboarding_echoes
+→ onboarding_stats_city
+→ onboarding_stats_echoes
+→ onboarding_confirm
+→ index
+```
+
+### CARATTERISTICHE
+
+* stato salvato in `$_SESSION['onboarding']`
+* navigazione bidirezionale
+* UI narrativa (Lene)
+* typing dinamico
 
 ---
 
-## 👤 Autore
+## 💾 PERSISTENZA
 
-**LaEmiX**
+Implementata in `onboarding_confirm.php`
+
+Processo:
+
+1. transaction start
+2. insert characters (city + echoes)
+3. mapping stats
+4. insert character_stats
+5. commit
+6. reset session onboarding
+
+Fail-safe:
+
+* rollback su errore
+
+---
+
+## 🎧 SISTEMA AUDIO
+
+Implementazione:
+
+* `app.php` come shell persistente
+* `<audio>` fuori dall’iframe
+
+Comportamento:
+
+* parte dopo interazione utente
+* continua tra le pagine
+* si interrompe su ingresso gioco
+
+Vincoli browser:
+
+* autoplay vietato senza input utente
+
+---
+
+## 🖥️ UI SYSTEM
+
+### FONT
+
+* VT323 → titoli
+* IBM Plex Mono → testo
+
+### COMPONENTI
+
+* auth-panel
+* auth-field
+* auth-button
+* auth-stat-row
+* lene-wrap
+
+### PRINCIPI
+
+* modularità
+* riuso
+* consistenza visiva
+
+---
+
+## 🔄 ROUTING
+
+`.htaccess`
+
+```
+DirectoryIndex app.php
+RewriteRule ^$ /app.php [L]
+```
+
+Sistema:
+
+* container iframe
+* routing interno via PHP
+
+---
+
+## ⚠️ ANTIPATTERN DA EVITARE
+
+* modifiche parziali (solo file completi)
+* CSS inline
+* logica duplicata
+* accesso diretto a DB fuori config
+* uso di ID numerici hardcoded per land
+
+---
+
+## 🚧 ROADMAP
+
+### IMMEDIATO
+
+* index.php (core gameplay)
+
+  * layout colonne
+  * location
+  * presenti
+
+### BREVE TERMINE
+
+* TalkBox (messaggistica)
+* gestione sessione avanzata
+* permessi utenti
+
+### MEDIO TERMINE
+
+* sistema eventi
+* inventario
+* combat system
+
+---
+
+## 🧩 STATO ATTUALE
+
+✔ Auth system completo
+✔ Onboarding completo
+✔ Persistenza DB completa
+✔ Multi-land funzionante
+✔ UI coerente
+✔ Audio system integrato
+
+👉 Sistema pronto per gameplay
+
+---
+
+## 📐 CONVENZIONI
+
+Naming:
+
+* snake_case DB
+* lowercase slug
+* file PHP descrittivi
+
+Regole:
+
+* file sempre completi
+* niente patch
+* firma obbligatoria
+
+---
+
+## ✍️ AUTORE
+
+LaEmiX
+
+---
+
+## 📌 NOTE FINALI
+
+Naraka è progettato per crescere senza rifattorizzazioni massicce.
+
+Ogni nuova feature deve:
+
+* integrarsi senza rompere flussi esistenti
+* rispettare session management
+* mantenere coerenza UI
+
+---
+
+**by LaEmiX**

@@ -7,8 +7,6 @@ session_start();
 $pdo = require __DIR__ . '/config/database.php';
 
 $errors = [];
-$success = false;
-
 $username = '';
 $email = '';
 
@@ -75,9 +73,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'password_hash' => $passwordHash,
         ]);
 
-        $success = true;
-        $username = '';
-        $email = '';
+        $idUser = (int) $pdo->lastInsertId();
+
+        session_regenerate_id(true);
+
+        $_SESSION['user'] = [
+            'id_user' => $idUser,
+            'username' => $username,
+            'email' => $email,
+            'role' => 'user',
+        ];
+
+        $_SESSION['current_land'] = 'city';
+        unset($_SESSION['character'], $_SESSION['onboarding']);
+
+        header('Location: /onboarding.php?step=city');
+        exit;
     }
 }
 
@@ -88,49 +99,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrazione - Naraka</title>
+    <link rel="stylesheet" href="/themes/auth.css">
 </head>
 <body>
 
-<h1>Registrazione Naraka</h1>
+<div class="auth-panel">
 
-<?php if ($success) { ?>
-    <p>Registrazione completata. Ora puoi accedere.</p>
-    <p><a href="/login.php">Vai al login</a></p>
-<?php } ?>
+    <h1 class="auth-title">NARAKA</h1>
+    <p class="auth-subtitle">Registrazione</p>
 
-<?php if ($errors) { ?>
-    <ul>
-        <?php foreach ($errors as $error) { ?>
-            <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-        <?php } ?>
-    </ul>
-<?php } ?>
+    <?php if ($errors) { ?>
+        <div class="auth-errors">
+            <ul>
+                <?php foreach ($errors as $error) { ?>
+                    <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                <?php } ?>
+            </ul>
+        </div>
+    <?php } ?>
 
-<form method="post" action="/register.php">
-    <p>
-        <label for="username">Nome utente</label><br>
-        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>" required>
-    </p>
+    <form method="post" action="/register.php">
+        <div class="auth-field">
+            <label for="username">Nome utente</label>
+            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username, ENT_QUOTES, 'UTF-8'); ?>" required>
+        </div>
 
-    <p>
-        <label for="email">Email</label><br>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>" required>
-    </p>
+        <div class="auth-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>" required>
+        </div>
 
-    <p>
-        <label for="password">Password</label><br>
-        <input type="password" id="password" name="password" required>
-    </p>
+        <div class="auth-field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
 
-    <p>
-        <label for="password_confirm">Conferma password</label><br>
-        <input type="password" id="password_confirm" name="password_confirm" required>
-    </p>
+        <div class="auth-field">
+            <label for="password_confirm">Conferma password</label>
+            <input type="password" id="password_confirm" name="password_confirm" required>
+        </div>
 
-    <button type="submit">Registrati</button>
-</form>
+        <button type="submit" class="auth-button">Registrati</button>
+    </form>
 
-<p><a href="/index.php">Torna alla home</a></p>
+    <div class="auth-links">
+        <a href="/login.php">Hai già un account? Accedi</a>
+        <a href="/index.php">Torna alla home</a>
+    </div>
+
+</div>
 
 </body>
 </html>

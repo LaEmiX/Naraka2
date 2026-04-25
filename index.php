@@ -17,7 +17,7 @@ $user = $_SESSION['user'];
 
 /* ================= RECUPERO LAND ================= */
 
-$currentLand = $_SESSION['current_land'] ?? 'city';
+$currentLand = (string) ($_SESSION['current_land'] ?? 'city');
 
 $stmt = $pdo->prepare("
     SELECT id_land, slug, name
@@ -26,7 +26,9 @@ $stmt = $pdo->prepare("
     LIMIT 1
 ");
 
-$stmt->execute(['slug' => $currentLand]);
+$stmt->execute([
+    'slug' => $currentLand,
+]);
 
 $land = $stmt->fetch();
 
@@ -36,38 +38,40 @@ if (!$land) {
     exit;
 }
 
-$idLand = (int)$land['id_land'];
+$idLand = (int) $land['id_land'];
+$landSlug = (string) $land['slug'];
 
 /* ================= CONTROLLO PERSONAGGI ================= */
 
 $stmt = $pdo->prepare("
-    SELECT id_land
-    FROM characters
-    WHERE id_user = :id_user
+    SELECT l.slug
+    FROM characters c
+    JOIN lands l ON l.id_land = c.id_land
+    WHERE c.id_user = :id_user
 ");
 
 $stmt->execute([
-    'id_user' => (int)$user['id_user']
+    'id_user' => (int) $user['id_user'],
 ]);
 
-$lands = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$userLands = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-$hasCity = in_array(1, $lands);
-$hasEcho = in_array(2, $lands);
+$hasCity = in_array('city', $userLands, true);
+$hasEchoes = in_array('echoes', $userLands, true);
 
-/* ================= REDIRECT CORRETTO ================= */
+/* ================= REDIRECT ONBOARDING ================= */
 
 if (!$hasCity) {
     header('Location: /onboarding_city.php');
     exit;
 }
 
-if (!$hasEcho) {
+if (!$hasEchoes) {
     header('Location: /onboarding_echoes.php');
     exit;
 }
 
-/* ================= PERSONAGGIO ================= */
+/* ================= PERSONAGGIO ATTIVO ================= */
 
 $stmt = $pdo->prepare("
     SELECT id_character, name
@@ -78,8 +82,8 @@ $stmt = $pdo->prepare("
 ");
 
 $stmt->execute([
-    'id_user' => (int)$user['id_user'],
-    'id_land' => $idLand
+    'id_user' => (int) $user['id_user'],
+    'id_land' => $idLand,
 ]);
 
 $character = $stmt->fetch();
@@ -88,6 +92,16 @@ if (!$character) {
     $_SESSION['current_land'] = 'city';
     header('Location: /index.php');
     exit;
+}
+
+/* ================= SWITCH LINK ================= */
+
+if ($landSlug === 'city') {
+    $switchLandSlug = 'echoes';
+    $switchLandLabel = 'Vai a Echoes';
+} else {
+    $switchLandSlug = 'city';
+    $switchLandLabel = 'Torna a City';
 }
 
 ?>
@@ -109,15 +123,17 @@ if (!$character) {
         <h1 class="auth-title">NARAKA</h1>
 
         <p class="auth-subtitle">
-            Land: <strong><?= htmlspecialchars($land['name']) ?></strong>
+            Land: <strong><?php echo htmlspecialchars((string) $land['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
         </p>
 
         <p class="auth-subtitle">
-            Personaggio: <strong><?= htmlspecialchars($character['name']) ?></strong>
+            Personaggio: <strong><?php echo htmlspecialchars((string) $character['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
         </p>
 
         <div class="auth-links">
-            <a href="/switch_land.php">Cambia Land</a>
+            <a href="/switch_land.php?land=<?php echo htmlspecialchars($switchLandSlug, ENT_QUOTES, 'UTF-8'); ?>">
+                <?php echo htmlspecialchars($switchLandLabel, ENT_QUOTES, 'UTF-8'); ?>
+            </a>
             <a href="/logout.php">Logout</a>
         </div>
 

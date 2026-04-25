@@ -54,6 +54,8 @@ try {
                     'role' => (string) $user['role'],
                 ];
 
+                $_SESSION['current_land'] = 'city';
+
                 $stmt = $pdo->prepare("
                     UPDATE users
                     SET last_login_at = CURRENT_TIMESTAMP
@@ -70,7 +72,7 @@ try {
         }
     }
 } catch (Throwable $e) {
-    $errors[] = 'Errore interno durante il login: ' . $e->getMessage();
+    $errors[] = 'Errore interno durante il login.';
 }
 
 ?>
@@ -80,35 +82,45 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Naraka</title>
+    <link rel="stylesheet" href="/themes/auth.css">
 </head>
 <body>
 
-<h1>Login Naraka</h1>
+<div class="auth-panel">
 
-<?php if ($errors) { ?>
-    <ul>
-        <?php foreach ($errors as $error) { ?>
-            <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
-        <?php } ?>
-    </ul>
-<?php } ?>
+    <h1 class="auth-title">NARAKA</h1>
+    <p class="auth-subtitle">Accesso sistema</p>
 
-<form method="post" action="/login.php">
-    <p>
-        <label for="login">Username o email</label><br>
-        <input type="text" id="login" name="login" value="<?php echo htmlspecialchars($login, ENT_QUOTES, 'UTF-8'); ?>" required>
-    </p>
+    <?php if ($errors) { ?>
+        <div class="auth-errors">
+            <ul>
+                <?php foreach ($errors as $error) { ?>
+                    <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
+                <?php } ?>
+            </ul>
+        </div>
+    <?php } ?>
 
-    <p>
-        <label for="password">Password</label><br>
-        <input type="password" id="password" name="password" required>
-    </p>
+    <form method="post" action="/login.php">
+        <div class="auth-field">
+            <label for="login">Username o email</label>
+            <input type="text" id="login" name="login" value="<?php echo htmlspecialchars($login, ENT_QUOTES, 'UTF-8'); ?>" required>
+        </div>
 
-    <button type="submit">Accedi</button>
-</form>
+        <div class="auth-field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
 
-<p><a href="/register.php">Non hai un account? Registrati</a></p>
-<p><a href="/index.php">Torna alla home</a></p>
+        <button type="submit" class="auth-button">Accedi</button>
+    </form>
+
+    <div class="auth-links">
+        <a href="/register.php">Non hai un account? Registrati</a>
+        <a href="/index.php">Torna alla home</a>
+    </div>
+
+</div>
 
 </body>
 </html>
